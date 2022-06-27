@@ -82,12 +82,30 @@ def get_planet_by_id(id):
 
 
 @app.route('/favorites/<int:id>', methods=['GET'])
-def handle_favorite_planets(id):
+def handle_favorites(id):
     favorites = FavoritesPlanets.query.filter_by(user_id = id).all()+FavoritesPeople.query.filter_by(user_id = id).all()
     response_body = []
     for favorite in favorites:
         response_body.append(favorite.serialize())
     return jsonify(response_body), 200
+
+@app.route('/favorite-people/<int:id>', methods=['GET'])
+def handle_favorite_people(id):
+    favorites = FavoritesPeople.query.filter_by(user_id = id).all()
+    response_body = []
+    for favorite in favorites:
+        response_body.append(favorite.serialize())
+    return jsonify(response_body), 200
+
+@app.route('/favorite-planets/<int:id>', methods=['GET'])
+def handle_favorite_planets(id):
+    favorites = FavoritesPlanets.query.filter_by(user_id = id).all()
+    response_body = []
+    for favorite in favorites:
+        response_body.append(favorite.serialize())
+    return jsonify(response_body), 200
+
+
 
 @app.route('/favorite/planet/<int:id>', methods=['POST'])
 def add_favorite_planet(id):
