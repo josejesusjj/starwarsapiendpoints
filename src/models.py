@@ -117,5 +117,4 @@ class FavoritesPlanets(db.Model):
             "id": self.id,
             "user_id": self.user_id,
             "planets_id": self.planets_id,
-            "planets_name": Planets.planets_name,
         }
