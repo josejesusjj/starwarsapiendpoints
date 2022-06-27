@@ -97,7 +97,7 @@ def handle_favorite_people(id):
         response_body.append(favorite.serialize())
     return jsonify(response_body), 200
 
-@app.route('/favorite-planets/<int:id>', methods=['GET'])
+@app.route('/favorite-planets/<int:id>/', methods=['GET'])
 def handle_favorite_planets(id):
     favorites = FavoritesPlanets.query.filter_by(user_id = id).all()
     response_body = []
@@ -107,11 +107,10 @@ def handle_favorite_planets(id):
 
 
 
-@app.route('/favorite/planet/<int:id>', methods=['POST'])
-def add_favorite_planet(id):
+@app.route('/favorite/planet/<int:user_id>/<int:planets_id>', methods=['POST'])
+def add_favorite_planet(user_id, planets_id):
     #user_id = request.form.get('user_id')
-    user_id = 1
-    favorite = FavoritesPlanets( user_id = user_id, planets_id = id)
+    favorite = FavoritesPlanets( user_id = user_id, planets_id = planets_id)
     db.session.add(favorite)
     db.session.commit()
     return jsonify({'response': "added succesfully"}), 200
