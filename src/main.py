@@ -115,6 +115,14 @@ def add_favorite_planet(user_id, planets_id):
     db.session.commit()
     return jsonify({'response': "added succesfully"}), 200
 
+@app.route('/favorite/people/<int:user_id>/<int:people_id>', methods=['POST'])
+def add_favorite_people(user_id, people_id):
+    #user_id = request.form.get('user_id')
+    favorite = FavoritesPeople( user_id = user_id, people_id = people_id)
+    db.session.add(favorite)
+    db.session.commit()
+    return jsonify({'response': "added succesfully"}), 200
+
 
 
 # this only runs if `$ python src/main.py` is executed
