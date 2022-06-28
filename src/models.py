@@ -90,6 +90,7 @@ class FavoritesPeople(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('favoritesPeople', lazy=True))
     people_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
+    people_name = db.Column(db.String(120), unique=False, nullable=True)
     people = db.relationship('People', backref=db.backref('favoritesPeople', lazy=True))
 
     def __repr__(self):
@@ -100,6 +101,7 @@ class FavoritesPeople(db.Model):
             "id": self.id,
             "user_id": self.user_id,
             "people_id": self.people_id,
+            "people_name": self.people_name,
         }
 
 class FavoritesPlanets(db.Model):
