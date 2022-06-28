@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, People, Planets, FavoritesPeople, FavoritesPlanets
+from models import db, User, People, Planets, Favorites
 #from models import Person
 
 app = Flask(__name__)
@@ -38,6 +38,9 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+    # General calls for users, people and planets:
+
 @app.route('/users', methods=['GET'])
 def handle_users():
     users = User.query.all()
@@ -64,6 +67,7 @@ def handle_planets():
         response_body.append(planet.serialize())
     return jsonify(response_body), 200
     
+ # Individual call for people and planets:
 
 @app.route('/people/<int:id>', methods=['GET'])
 def get_people_by_id(id):
@@ -79,78 +83,44 @@ def get_planet_by_id(id):
         return jsonify(planet.serialize()), 200
     return ({'error': 'Planet not found'}), 404
 
-
+ # calls, adds and removes favorites:
 
 @app.route('/favorites/<int:id>', methods=['GET'])
 def handle_favorites(id):
-    favorites = FavoritesPlanets.query.filter_by(user_id = id).all()+FavoritesPeople.query.filter_by(user_id = id).all()
+    favorites = Favorites.query.filter_by(user_id = id).all()
     response_body = []
     for favorite in favorites:
         response_body.append(favorite.serialize())
     return jsonify(response_body), 200
 
-@app.route('/favorite-people/<int:id>', methods=['GET'])
-def handle_favorite_people(id):
-    favorites = FavoritesPeople.query.filter_by(user_id = id).all()
-    response_body = []
-    for favorite in favorites:
-        response_body.append(favorite.serialize())
-    return jsonify(response_body), 200
 
-@app.route('/favorite-planets/<int:id>/', methods=['GET'])
-def handle_favorite_planets(id):
-    favorites = FavoritesPlanets.query.filter_by(user_id = id).all()
-    response_body = []
-    for favorite in favorites:
-        response_body.append(favorite.serialize())
-    return jsonify(response_body), 200
-
-@app.route('/favorite-add/planets/<int:user_id>/<int:planets_id>', methods=['GET','POST'])
+@app.route('/favorite-add', methods=['GET','POST'])
 def add_favorite_planet(user_id, planets_id):
     #user_id = request.form.get('user_id')
-    new = FavoritesPlanets( user_id = user_id, planets_id = planets_id)
-    db.session.add(new)
+    #new = Favorites( user_id = user_id, planets_id = planets_id)
+    user_id = request.form.get('user_id')
+    item_id = request.form.get('item_id')
+    item_name = request.form.get('item_name')
+    category = request.form.get('category')
+    item = Favorites( user_id=user_id, item_id=item_id, item_name=item_name, category=category)
+    db.session.add(item)
     db.session.commit()
-    favorites = FavoritesPlanets.query.filter_by(user_id = user_id).all()
+    favorites = Favorites.query.filter_by(user_id = user_id).all()
     response_body = []
     for favorite in favorites:
         response_body.append(favorite.serialize())
     return jsonify(response_body), 200
 
-@app.route('/favorite-add/people/<int:user_id>/<int:people_id>', methods=['GET','POST'])
-def add_favorite_people(user_id, people_id):
-    #user_id = request.form.get('user_id')
-    new = FavoritesPeople( user_id = user_id, people_id = people_id)
-    db.session.add(new)
-    db.session.commit()
-    favorites = FavoritesPeople.query.filter_by(user_id = user_id).all()
-    response_body = []
-    for favorite in favorites:
-        response_body.append(favorite.serialize())
-    return jsonify(response_body), 200
-
-
-@app.route('/favorite-delete/people/<int:id>', methods=['GET','POST'])
+@app.route('/favorite-delete/<int:id>', methods=['GET','POST'])
 def delete_favorite_people(id):
-    old = FavoritesPeople.query.get(id)
+    old = Favorites.query.get(id)
     db.session.delete(old)
     db.session.commit()
-    favorites = FavoritesPeople.query.filter_by(user_id = 1).all()
+    favorites = Favorites.query.filter_by(user_id = 1).all()
     response_body = []
     for favorite in favorites:
         response_body.append(favorite.serialize())
     return jsonify(response_body), 200   
-
-@app.route('/favorite-delete/planets/<int:id>', methods=['GET','POST'])
-def delete_favorite_planet(id):
-    old = FavoritesPlanets.query.get(id)
-    db.session.delete(old)
-    db.session.commit()
-    favorites = FavoritesPlanets.query.filter_by(user_id = 1).all()
-    response_body = []
-    for favorite in favorites:
-        response_body.append(favorite.serialize())
-    return jsonify(response_body), 200
 
 
 # this only runs if `$ python src/main.py` is executed

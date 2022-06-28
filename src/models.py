@@ -85,38 +85,27 @@ class Planets(db.Model):
         planets = cls.query.get(id)
         return planets
 
-class FavoritesPeople(db.Model):
+class Favorites(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('favoritesPeople', lazy=True))
-    people_id = db.Column(db.Integer, db.ForeignKey('people.id'), nullable=False)
-    people_name = db.Column(db.String(120), unique=False, nullable=True)
-    people = db.relationship('People', backref=db.backref('favoritesPeople', lazy=True))
+    item_id = db.Column(db.Integer, nullable=False)
+    item_name = db.Column(db.String(120), unique=False, nullable=False)
+    category = db.Column(db.String(120), unique=False, nullable=False)
 
     def __repr__(self):
-        return '<FavoritesPeople %r>' % self.id
+        return '<Favorites %r>' % self.id
 
     def serialize(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "people_id": self.people_id,
-            "people_name": self.people_name,
+            "item_id": self.people_id,
+            "item_name": self.people_name,
+            "category": self.category,
         }
 
-class FavoritesPlanets(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('favoritesPlanets', lazy=True))
-    planets_id = db.Column(db.Integer, db.ForeignKey('planets.id'), nullable=False)
-    planets = db.relationship('Planets', backref=db.backref('favoritesPlanets', lazy=True))
-
-    def __repr__(self):
-        return '<FavoritesPlanets %r>' % self.id
-
-    def serialize(self):
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "planets_id": self.planets_id,
-        }
+    @classmethod
+    def get_by_id(cls, id):
+        favorites = cls.query.get(id)
+        return favorites
