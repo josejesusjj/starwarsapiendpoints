@@ -9,7 +9,6 @@ from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User, People, Planets, Favorites
-#from models import Person
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -93,11 +92,17 @@ def handle_favorites(id):
         response_body.append(favorite.serialize())
     return jsonify(response_body), 200
 
+@app.route('/favorites/<int:id>', methods=['GET'])
+def handle_favorite(id):
+    favorites = Favorites.query.filter_by(item_id = id).all()
+    response_body = []
+    for favorite in favorites:
+        response_body.append(favorite.serialize())
+    return jsonify(response_body), 200
+
 
 @app.route('/favorite-add', methods=['GET','POST'])
-def add_favorite_planet(user_id, planets_id):
-    #user_id = request.form.get('user_id')
-    #new = Favorites( user_id = user_id, planets_id = planets_id)
+def add_favorite_planet():
     user_id = request.form.get('user_id')
     item_id = request.form.get('item_id')
     item_name = request.form.get('item_name')
@@ -111,9 +116,9 @@ def add_favorite_planet(user_id, planets_id):
         response_body.append(favorite.serialize())
     return jsonify(response_body), 200
 
-@app.route('/favorite-delete/<int:id>', methods=['GET','POST'])
-def delete_favorite_people(id):
-    old = Favorites.query.get(id)
+@app.route('/favorite-delete/<int:user_id>/<int:category>/<int:item_id>', methods=['GET','POST'])
+def delete_favorite_people(user_id, category, item_id):
+    old = Favorites.query.filter_by(user_id = user_id, category = category, item_id = item_id).first()
     db.session.delete(old)
     db.session.commit()
     favorites = Favorites.query.filter_by(user_id = 1).all()
